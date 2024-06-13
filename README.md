@@ -1,2 +1,122 @@
-# CS120B_Embedded_Systems_Project
-Final Project for my embedded systems class in spring 2024
+This was my final project for my embedded systems class at UCR in spring 2024. Below is most of my project report.
+
+# Project Overview
+
+Final Demo Video: https://youtu.be/Xe39ehWLJDo
+
+My project is a video game similar in gameplay to the arcade game Space Invaders. The game is displayed on a small screen and controlled by 3 buttons and a joystick. 
+When the game boots up initially, it opens on a title screen and indicates the button for starting a new game. When the button is pressed it begins the game. 
+The gameplay consists of moving from side to side on the bottom of the screen and shooting upward to destroy the enemies that descend from the top of the screen. Bullets shot by the player move upward and can destroy one enemy. Each enemy destroyed gives the player one point, and if an enemy reaches the player or the bottom of the screen, the game ends. The enemies start sparse, and become more numerous as time proceeds. During gameplay, the player can pause the game, which brings up the pause menu. From this menu they can see options to resume the game, restart the game (start a new game with enemies, player, and score reset), their current score, and the all-time high-score (persists when the game is turned off). When the player dies, they can see their finishing score, the highscore (which turns yellow to indicate a new high score if applicable), and the option to restart. 
+The system plays sound effects for various events such as the intro, shooting, pressing a button, dying, etc.
+
+
+# I/O
+
+
+Inputs: The user uses the joystick to move left and right while in gameplay. There are also three buttons, which are used to shoot, pause/unpause, and restart the game. They do nothing if the current state of the game is not appropriate (ex. while paused, the shoot button does nothing).
+Outputs: The system uses the color LCD display to show visuals to the user, and the passive buzzer to produce sound effects.
+
+# Features
+
+__128x128 Color LCD Display:__
+
+Demo Video: https://youtube.com/shorts/6bHaW13nGtw 
+
+I used the screen to display all of the game information to the player. Communication from the microcontroller to the display (commands and data) works using SPI communication.
+In my code, I have divided up the LCD display into an 8x8 grid of 16x16 squares, since my player and enemy sprites are each 16x16 pixels. In order to draw a sprite, I select a rectangle of these squares of the appropriate size and then transmit the colors of the desired sprite. The sprite color data is contained in arrays that are incremented through and each color sent to the display. 
+The way that the LCD screen receives data meant that some features I wanted to implement ended up being much more complex than they would seem. In the beginning I intended to completely draw each frame of the game, but the data communication turned out to be too slow for this to be feasible. This is why I settled on my 8x8 grid, because it made it easier to redraw only the areas that had updates each tick instead of the whole screen. I also had to give up on trying to implement animations or allowing the player character to move smoothly instead of snapping between grid squares.
+
+__Passive Buzzer:__
+
+Demo Video: https://youtu.be/x4YBtBqNnFo
+
+I used the passive buzzer to produce sound effects for various events in the game. Changing the tone of the buzzer is done by changing the period of the atmega’s built-in PWM.  
+My implementation works by storing all of the sounds as arrays of tones which are incremented through to produce a sound. In order to make music, I had to do some conversions: sheet music notes to Hz, and then Hz to PWM input. The different sound effects are ordered by priority so that only a higher (or equal) priority sound will cut off the currently-playing sound. 
+
+__EEPROM:__
+
+Demo Video: https://youtu.be/uqDETViLaB0
+
+I used the atmega’s EEPROM to store the all-time high score that has been achieved. When the system starts, it reads the EPROM and stores its value. Since the score is an unsigned short, two 1-byte reads are required to get the two bytes. Whenever the player dies, the game checks if their score is higher than the highscore, and if it is the EEPROM is overwritten with the new value (and the player is informed via the high score display turning yellow). 
+
+
+Software:
+The program is relatively complex. The current state of the game in regards to player and enemy locations is stored in an 2D array representing the 8x8 grid. This array is updated by functions which are called from other parts of the program, like the player moving or the enemies advancing. Whenever this happens, a second 2D array is set to 1 at that location to indicate that an update has occurred and the rendering task needs to redraw that square. The bullets shot by the player are stored as structs in a separate 1D array, since they are smaller than 16x16 and so their location could not be represented by the array explained above. Thus the enemies and bullets also advance at different rates. 
+Inputs that control the state of the game are stored in a queue. This includes player input as well as signals from other tasks, for example the “die” input. I could not find a queue library that would work so I made my own.
+Implementing sprites was tricky. I ran into several hurdles when trying to figure out how to extract the color data from the art that I made. The method that I settled on was to first color everything in a very limited color palette and export the art as a .ppm file (a simple image format with no compression). I then transcribed the colors from those files, using a separate program that I wrote, into a text file, with the formatting of a 2D array. Each color in the palette is represented by a char. I can then paste these arrays into my data header file, where my program reads through them and translates them back into the correct colors and then into data for the display. I drew all of the sprites in my game and implemented them with this method.
+
+Challenges / Difficulties
+
+
+
+A big technical problem that I ran into immediately was the accelerometer / gyroscope, which I originally intended to include as motion control. However the gyroscope turned out to be much more complicated than I expected, as it has a huge amount of features and its own on-board microchip that processes its data. I also could not find any library for it that did not use any arduino software and that was not so low-level that I couldn’t comprehend it. I ended up scrapping that idea after spending a lot of time failing to make any progress on my project. 
+Another problem that I ran into later and that was daunting at first was the lack of RAM on the atmega. A single sprite (the opening title) was four times the size of the entire RAM available. Trying to run the program in this condition produced some interesting corruption of the game.  However I managed to solve this problem and still largely accomplish what I wanted. Firstly, I decreased the amount of memory needed for a sprite. Initially I was storing each pixel as an array of three values for red, green, and blue, and so I could get virtually any color I liked. I sacrificed detail and shading and switched to the color palette method explained above, so each pixel was only 1 number. Then, I realized the atmega also had flash memory, and a lot more of it than RAM. I stored all of my sprites in flash memory, and ended up using 95% of it. 
+
+Corrupted gameplay
+
+Enemies before and after the switch. 
+
+One more unexpected challenge was sticking to the SM best practices that I learned in class. The main issue was I couldn’t think of practical ways to not have multiple tasks writing to the same variables. I was not completely successful, but I think in most cases it is still not nondeterministic. For example many tasks can trigger a sound, and are therefore calling the function that writes to the sound variables. However since the sound is not blindly changed and instead only higher priority sounds can overwrite, the result will be the same at the end of a tick no matter which order the tasks were called in. 
+
+
+Extra Features
+
+If I were to work on this project more, I would add some basic animations. For example, the enemies would wiggle their tentacles, the tank would spin its treads, and shooting would create a small explosion of smoke. In order to do this I would have to redo how I store the sprites though, because currently I have no more memory. I could do this by representing each pixel with a nibble instead of a byte, since I only have 7 colors. This would require more bit manipulation because the smallest variable type is still a char. However this would decrease my memory usage by half and I could include many more sprites. This would probably also allow me to include a background for my game. Implementing a background would be cool, although it would take more complexity when drawing the sprites, and I would have to add transparent pixels.
+
+Your Experience
+
+Talk about your experience with the project. Were there any aspects that you specifically enjoyed? Were there any aspects that you specifically disliked?
+
+Overall I had a good experience working on this project. The only unpleasant parts were when I was struggling and making no progress when trying to get a hardware component to work. Debugging is difficult with hardware, but once it was working I had a good time programming and controlling it with the microcontroller. My plan for the tasks worked well and they did not conflict with each other, so I could make and test one piece at a time. It was especially gratifying to see my sprites show up on the screen for the first time. 
+
+Task Diagram
+
+note: these times are using the original timerISR.h, so in reality the periods are twice as fast.
+
+State Machine Diagrams
+
+PauseButton
+
+RestartButton
+ShootButton
+
+Joystick
+
+GameUpdate
+
+LCDUpdate
+
+EnemyAdvance
+
+BulletAdvance
+
+Buzzer
+
+Increment Difficulty
+
+
+ 
+
+External References
+
+List any external references that you may have accessed, including but not limited to websites, datasheets, vendor-provided source code that you used, etc. 
+
+TA-provided Headers:
+"spiAVR.h"
+"helper.h"
+“periph.h”
+"timerISR.h"
+"serialATmega.h" (debugging only)
+	Libraries:
+<stdlib.h>
+<avr/pgmspace.h>
+<avr/eeprom.h>
+	References:
+Previous labs (ex. for the passive buzzer)
+TA-provided slides on the LCD Display
+LCD datasheet
+Website explaining how to use flash memory
+avr/eeprom.h documentation
+music note to frequency chart
+ppm file reader source (used ppm.h and ppm.cpp only)
+
