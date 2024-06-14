@@ -1,4 +1,4 @@
-This was my final project for my embedded systems class at UCR in spring 2024. Below is most of my project report.
+This was my final project for my embedded systems class at UCR in spring 2024. It was made using the Elegoo Uno 3 (atmega 328 microcontroller). Below is most of my project report.
 
 # Project Overview
 
@@ -9,9 +9,13 @@ When the game boots up initially, it opens on a title screen and indicates the b
 The gameplay consists of moving from side to side on the bottom of the screen and shooting upward to destroy the enemies that descend from the top of the screen. Bullets shot by the player move upward and can destroy one enemy. Each enemy destroyed gives the player one point, and if an enemy reaches the player or the bottom of the screen, the game ends. The enemies start sparse, and become more numerous as time proceeds. During gameplay, the player can pause the game, which brings up the pause menu. From this menu they can see options to resume the game, restart the game (start a new game with enemies, player, and score reset), their current score, and the all-time high-score (persists when the game is turned off). When the player dies, they can see their finishing score, the highscore (which turns yellow to indicate a new high score if applicable), and the option to restart. 
 The system plays sound effects for various events such as the intro, shooting, pressing a button, dying, etc.
 
-<img height="300" align="left" src="https://github.com/andersAsch0/CS120B_Embedded_Systems_Project/assets/84699083/8b76b663-22bf-430a-b818-9ec3f0ce37dc">
-<img height="300" align="left" alt="Screen Shot 2024-06-14 at 10 43 55 AM" src="https://github.com/andersAsch0/CS120B_Embedded_Systems_Project/assets/84699083/55fb8af8-d6fe-4140-8292-d7ef4584ca6c">
-<img height="300" src="https://github.com/andersAsch0/CS120B_Embedded_Systems_Project/assets/84699083/d9b25eb2-7ec3-4fd3-9b6b-087f422063e6">
+<img width="700" alt="Screen Shot 2024-06-14 at 11 13 32 AM" src="https://github.com/andersAsch0/CS120B_Embedded_Systems_Project/assets/84699083/a69e9924-c310-4896-8a4d-26c2d99067bd">
+
+<br>
+
+<img height="250" align="left" src="https://github.com/andersAsch0/CS120B_Embedded_Systems_Project/assets/84699083/8b76b663-22bf-430a-b818-9ec3f0ce37dc">
+<img height="250" align="left" alt="Screen Shot 2024-06-14 at 10 43 55 AM" src="https://github.com/andersAsch0/CS120B_Embedded_Systems_Project/assets/84699083/55fb8af8-d6fe-4140-8292-d7ef4584ca6c">
+<img height="250" src="https://github.com/andersAsch0/CS120B_Embedded_Systems_Project/assets/84699083/d9b25eb2-7ec3-4fd3-9b6b-087f422063e6">
 
 
 # I/O
@@ -53,6 +57,8 @@ Implementing sprites was tricky. I ran into several hurdles when trying to figur
 A big problem that I ran into later and that was daunting at first was the lack of RAM on the atmega. A single sprite (the opening title) was four times the size of the entire RAM available. Trying to run the program in this condition produced some interesting corruption of the game.  However I managed to solve this problem and still largely accomplish what I wanted. Firstly, I decreased the amount of memory needed for a sprite. Initially I was storing each pixel as an array of three values for red, green, and blue, and so I could get virtually any color I liked. I sacrificed detail and shading and switched to the color palette method explained above, so each pixel was only 1 number. Then, I realized the atmega also had flash memory, and a lot more of it than RAM. I stored all of my sprites in flash memory, and ended up using 95% of it. 
 
 <a href="url"><img src="https://github.com/andersAsch0/CS120B_Embedded_Systems_Project/assets/84699083/8ee9554a-be1b-48fa-9bc9-98e7b632db19" width="500" ></a> 
+
+
 Corrupted gameplay
 
 
