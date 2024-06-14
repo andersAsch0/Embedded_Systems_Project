@@ -9,9 +9,14 @@ When the game boots up initially, it opens on a title screen and indicates the b
 The gameplay consists of moving from side to side on the bottom of the screen and shooting upward to destroy the enemies that descend from the top of the screen. Bullets shot by the player move upward and can destroy one enemy. Each enemy destroyed gives the player one point, and if an enemy reaches the player or the bottom of the screen, the game ends. The enemies start sparse, and become more numerous as time proceeds. During gameplay, the player can pause the game, which brings up the pause menu. From this menu they can see options to resume the game, restart the game (start a new game with enemies, player, and score reset), their current score, and the all-time high-score (persists when the game is turned off). When the player dies, they can see their finishing score, the highscore (which turns yellow to indicate a new high score if applicable), and the option to restart. 
 The system plays sound effects for various events such as the intro, shooting, pressing a button, dying, etc.
 
+<img height="300" align="left" src="https://github.com/andersAsch0/CS120B_Embedded_Systems_Project/assets/84699083/8b76b663-22bf-430a-b818-9ec3f0ce37dc">
+<img height="300" alt="Screen Shot 2024-06-14 at 10 43 55 AM" src="https://github.com/andersAsch0/CS120B_Embedded_Systems_Project/assets/84699083/55fb8af8-d6fe-4140-8292-d7ef4584ca6c">
+
+<img height="300" align="left" src="https://github.com/andersAsch0/CS120B_Embedded_Systems_Project/assets/84699083/d9b25eb2-7ec3-4fd3-9b6b-087f422063e6">
+
+
 
 # I/O
-
 
 Inputs: The user uses the joystick to move left and right while in gameplay. There are also three buttons, which are used to shoot, pause/unpause, and restart the game. They do nothing if the current state of the game is not appropriate (ex. while paused, the shoot button does nothing).
 Outputs: The system uses the color LCD display to show visuals to the user, and the passive buzzer to produce sound effects.
@@ -20,7 +25,7 @@ Outputs: The system uses the color LCD display to show visuals to the user, and 
 
 __128x128 Color LCD Display:__
 
-Demo Video: https://youtube.com/shorts/6bHaW13nGtw 
+Demo Video: https://youtube.com/watch/6bHaW13nGtw 
 
 I used the screen to display all of the game information to the player. Communication from the microcontroller to the display (commands and data) works using SPI communication.
 In my code, I have divided up the LCD display into an 8x8 grid of 16x16 squares, since my player and enemy sprites are each 16x16 pixels. In order to draw a sprite, I select a rectangle of these squares of the appropriate size and then transmit the colors of the desired sprite. The sprite color data is contained in arrays that are incremented through and each color sent to the display. 
