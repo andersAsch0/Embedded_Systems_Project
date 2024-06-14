@@ -10,10 +10,8 @@ The gameplay consists of moving from side to side on the bottom of the screen an
 The system plays sound effects for various events such as the intro, shooting, pressing a button, dying, etc.
 
 <img height="300" align="left" src="https://github.com/andersAsch0/CS120B_Embedded_Systems_Project/assets/84699083/8b76b663-22bf-430a-b818-9ec3f0ce37dc">
-<img height="300" alt="Screen Shot 2024-06-14 at 10 43 55 AM" src="https://github.com/andersAsch0/CS120B_Embedded_Systems_Project/assets/84699083/55fb8af8-d6fe-4140-8292-d7ef4584ca6c">
-
-<img height="300" align="left" src="https://github.com/andersAsch0/CS120B_Embedded_Systems_Project/assets/84699083/d9b25eb2-7ec3-4fd3-9b6b-087f422063e6">
-
+<img height="300" align="left" alt="Screen Shot 2024-06-14 at 10 43 55 AM" src="https://github.com/andersAsch0/CS120B_Embedded_Systems_Project/assets/84699083/55fb8af8-d6fe-4140-8292-d7ef4584ca6c">
+<img height="300" src="https://github.com/andersAsch0/CS120B_Embedded_Systems_Project/assets/84699083/d9b25eb2-7ec3-4fd3-9b6b-087f422063e6">
 
 
 # I/O
