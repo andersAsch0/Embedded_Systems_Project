@@ -67,29 +67,51 @@ One more unexpected challenge was sticking to the SM best practices that I learn
 
 
 # Task Diagrams
+<img height="600" src="https://github.com/andersAsch0/CS120B_Embedded_Systems_Project/assets/84699083/a85587ba-0983-4e5b-8ec7-1453fad9d1a2">
 
 note: timerISR.h turned out to have an error, so in reality the periods are twice as fast.
 
-State Machine Diagrams
+__State Machine Diagrams__
 
 PauseButton
 
+<img height="200" src="https://github.com/andersAsch0/CS120B_Embedded_Systems_Project/assets/84699083/142c5f3b-6786-4421-a898-0b42bb83a6ac">
+
 RestartButton
+
+<img height="200" src="https://github.com/andersAsch0/CS120B_Embedded_Systems_Project/assets/84699083/8a8569e2-a857-4b5a-809e-f8e69300ed2f">
+
 ShootButton
+
+<img height="200" src="https://github.com/andersAsch0/CS120B_Embedded_Systems_Project/assets/84699083/ff4a2fc9-655e-4f42-ab65-3f264e47d682">
 
 Joystick
 
+<img height="350" src="https://github.com/andersAsch0/CS120B_Embedded_Systems_Project/assets/84699083/d876a739-a085-46fa-9e92-9c1a80dbd990">
+
 GameUpdate
+
+<img height="600" src="https://github.com/andersAsch0/CS120B_Embedded_Systems_Project/assets/84699083/439307a9-a2aa-4f70-9a93-28a77d2faa04">
 
 LCDUpdate
 
+<img height="300" src="https://github.com/andersAsch0/CS120B_Embedded_Systems_Project/assets/84699083/4a6adf16-f421-4b4c-b438-10d6dc70ae00">
+
 EnemyAdvance
+
+<img height="200" src="https://github.com/andersAsch0/CS120B_Embedded_Systems_Project/assets/84699083/4e671d1a-ad72-4d66-8e83-748e1e543b2d">
 
 BulletAdvance
 
+<img height="150" src="https://github.com/andersAsch0/CS120B_Embedded_Systems_Project/assets/84699083/49fcd0aa-28f1-4ccd-a3b9-a48e4a15c4e6">
+
 Buzzer
 
+<img height="300" src="https://github.com/andersAsch0/CS120B_Embedded_Systems_Project/assets/84699083/78e44bf1-0a7e-44fd-8cbf-2bc56ca6f2dd">
+
 Increment Difficulty
+
+<img height="150" src="https://github.com/andersAsch0/CS120B_Embedded_Systems_Project/assets/84699083/ab8befee-b8e6-4cec-ab21-0ab55c545217">
 
 
  
