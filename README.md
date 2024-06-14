@@ -119,21 +119,24 @@ Increment Difficulty
 # External References
 
 TA-provided Headers:
-"spiAVR.h"
-"helper.h"
-“periph.h”
-"timerISR.h"
-"serialATmega.h" (debugging only)
+- "spiAVR.h"
+- "helper.h"
+- “periph.h”
+- "timerISR.h"
+- "serialATmega.h" (debugging only)
+
+
 Libraries:
-<stdlib.h>
-<avr/pgmspace.h>
-<avr/eeprom.h>
+- <stdlib.h>
+- <avr/pgmspace.h>
+- <avr/eeprom.h>
+
 References:
-Previous labs (ex. for the passive buzzer)
-TA-provided slides on the LCD Display
-LCD datasheet
-Website explaining how to use flash memory
-avr/eeprom.h documentation
-music note to frequency chart
-ppm file reader source (used ppm.h and ppm.cpp only)
+- Previous labs (ex. for the passive buzzer)
+- TA-provided slides on the LCD Display
+- [LCD datasheet](https://www.displayfuture.com/Display/datasheet/controller/ST7735.pdf)
+- [Website explaining how to use flash memory](https://wellys.com/posts/avr_c_progmem/)
+- [avr/eeprom.h documentation](https://www.nongnu.org/avr-libc/user-manual/group__avr__eeprom.html)
+- [music note to frequency chart](https://mixbutton.com/mixing-articles/music-note-to-frequency-chart/)
+- [ppm file reader source](https://github.com/sol-prog/Perlin_Noise) (used ppm.h and ppm.cpp only)
 
