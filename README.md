@@ -39,39 +39,32 @@ Demo Video: https://youtu.be/uqDETViLaB0
 
 I used the atmega’s EEPROM to store the all-time high score that has been achieved. When the system starts, it reads the EPROM and stores its value. Since the score is an unsigned short, two 1-byte reads are required to get the two bytes. Whenever the player dies, the game checks if their score is higher than the highscore, and if it is the EEPROM is overwritten with the new value (and the player is informed via the high score display turning yellow). 
 
+__Software:__
 
-Software:
-The program is relatively complex. The current state of the game in regards to player and enemy locations is stored in an 2D array representing the 8x8 grid. This array is updated by functions which are called from other parts of the program, like the player moving or the enemies advancing. Whenever this happens, a second 2D array is set to 1 at that location to indicate that an update has occurred and the rendering task needs to redraw that square. The bullets shot by the player are stored as structs in a separate 1D array, since they are smaller than 16x16 and so their location could not be represented by the array explained above. Thus the enemies and bullets also advance at different rates. 
+The current state of the game in regards to player and enemy locations is stored in an 2D array representing the 8x8 grid. This array is updated by functions which are called from other parts of the program, like the player moving or the enemies advancing. Whenever this happens, a second 2D array is set to 1 at that location to indicate that an update has occurred and the rendering task needs to redraw that square. The bullets shot by the player are stored as structs in a separate 1D array, since they are smaller than 16x16 and so their location could not be represented by the array explained above. Thus the enemies and bullets also advance at different rates. 
 Inputs that control the state of the game are stored in a queue. This includes player input as well as signals from other tasks, for example the “die” input. I could not find a queue library that would work so I made my own.
 Implementing sprites was tricky. I ran into several hurdles when trying to figure out how to extract the color data from the art that I made. The method that I settled on was to first color everything in a very limited color palette and export the art as a .ppm file (a simple image format with no compression). I then transcribed the colors from those files, using a separate program that I wrote, into a text file, with the formatting of a 2D array. Each color in the palette is represented by a char. I can then paste these arrays into my data header file, where my program reads through them and translates them back into the correct colors and then into data for the display. I drew all of the sprites in my game and implemented them with this method.
 
-Challenges / Difficulties
+# Challenges / Difficulties:
 
+A big problem that I ran into later and that was daunting at first was the lack of RAM on the atmega. A single sprite (the opening title) was four times the size of the entire RAM available. Trying to run the program in this condition produced some interesting corruption of the game.  However I managed to solve this problem and still largely accomplish what I wanted. Firstly, I decreased the amount of memory needed for a sprite. Initially I was storing each pixel as an array of three values for red, green, and blue, and so I could get virtually any color I liked. I sacrificed detail and shading and switched to the color palette method explained above, so each pixel was only 1 number. Then, I realized the atmega also had flash memory, and a lot more of it than RAM. I stored all of my sprites in flash memory, and ended up using 95% of it. 
 
-
-A big technical problem that I ran into immediately was the accelerometer / gyroscope, which I originally intended to include as motion control. However the gyroscope turned out to be much more complicated than I expected, as it has a huge amount of features and its own on-board microchip that processes its data. I also could not find any library for it that did not use any arduino software and that was not so low-level that I couldn’t comprehend it. I ended up scrapping that idea after spending a lot of time failing to make any progress on my project. 
-Another problem that I ran into later and that was daunting at first was the lack of RAM on the atmega. A single sprite (the opening title) was four times the size of the entire RAM available. Trying to run the program in this condition produced some interesting corruption of the game.  However I managed to solve this problem and still largely accomplish what I wanted. Firstly, I decreased the amount of memory needed for a sprite. Initially I was storing each pixel as an array of three values for red, green, and blue, and so I could get virtually any color I liked. I sacrificed detail and shading and switched to the color palette method explained above, so each pixel was only 1 number. Then, I realized the atmega also had flash memory, and a lot more of it than RAM. I stored all of my sprites in flash memory, and ended up using 95% of it. 
-
+<a href="url"><img src="https://github.com/andersAsch0/CS120B_Embedded_Systems_Project/assets/84699083/8ee9554a-be1b-48fa-9bc9-98e7b632db19" width="500" ></a> 
 Corrupted gameplay
 
+
+
+<img height="200" alt="quintesson" src="https://github.com/andersAsch0/CS120B_Embedded_Systems_Project/assets/84699083/22e7053c-3cad-4de8-8c4f-046c322fe713" align="left">
+<img height="200" alt="Screen Shot 2024-06-13 at 5 19 46 PM" src="https://github.com/andersAsch0/CS120B_Embedded_Systems_Project/assets/84699083/a81334f7-7276-4352-800b-c9a9a908bb1a">
 Enemies before and after the switch. 
+
 
 One more unexpected challenge was sticking to the SM best practices that I learned in class. The main issue was I couldn’t think of practical ways to not have multiple tasks writing to the same variables. I was not completely successful, but I think in most cases it is still not nondeterministic. For example many tasks can trigger a sound, and are therefore calling the function that writes to the sound variables. However since the sound is not blindly changed and instead only higher priority sounds can overwrite, the result will be the same at the end of a tick no matter which order the tasks were called in. 
 
 
-Extra Features
+# Task Diagrams
 
-If I were to work on this project more, I would add some basic animations. For example, the enemies would wiggle their tentacles, the tank would spin its treads, and shooting would create a small explosion of smoke. In order to do this I would have to redo how I store the sprites though, because currently I have no more memory. I could do this by representing each pixel with a nibble instead of a byte, since I only have 7 colors. This would require more bit manipulation because the smallest variable type is still a char. However this would decrease my memory usage by half and I could include many more sprites. This would probably also allow me to include a background for my game. Implementing a background would be cool, although it would take more complexity when drawing the sprites, and I would have to add transparent pixels.
-
-Your Experience
-
-Talk about your experience with the project. Were there any aspects that you specifically enjoyed? Were there any aspects that you specifically disliked?
-
-Overall I had a good experience working on this project. The only unpleasant parts were when I was struggling and making no progress when trying to get a hardware component to work. Debugging is difficult with hardware, but once it was working I had a good time programming and controlling it with the microcontroller. My plan for the tasks worked well and they did not conflict with each other, so I could make and test one piece at a time. It was especially gratifying to see my sprites show up on the screen for the first time. 
-
-Task Diagram
-
-note: these times are using the original timerISR.h, so in reality the periods are twice as fast.
+note: timerISR.h turned out to have an error, so in reality the periods are twice as fast.
 
 State Machine Diagrams
 
@@ -97,9 +90,7 @@ Increment Difficulty
 
  
 
-External References
-
-List any external references that you may have accessed, including but not limited to websites, datasheets, vendor-provided source code that you used, etc. 
+# External References
 
 TA-provided Headers:
 "spiAVR.h"
@@ -107,11 +98,11 @@ TA-provided Headers:
 “periph.h”
 "timerISR.h"
 "serialATmega.h" (debugging only)
-	Libraries:
+Libraries:
 <stdlib.h>
 <avr/pgmspace.h>
 <avr/eeprom.h>
-	References:
+References:
 Previous labs (ex. for the passive buzzer)
 TA-provided slides on the LCD Display
 LCD datasheet
