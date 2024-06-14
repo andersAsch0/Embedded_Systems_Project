@@ -53,9 +53,10 @@ A big problem that I ran into later and that was daunting at first was the lack 
 Corrupted gameplay
 
 
-
+<img height="200" alt="oldQuintesson" src="https://github.com/andersAsch0/CS120B_Embedded_Systems_Project/assets/84699083/20d22e5b-dfc6-4ac3-bbc0-fc08ee7a5fdc" aligh = "left">
 <img height="200" alt="quintesson" src="https://github.com/andersAsch0/CS120B_Embedded_Systems_Project/assets/84699083/22e7053c-3cad-4de8-8c4f-046c322fe713" align="left">
 <img height="200" alt="Screen Shot 2024-06-13 at 5 19 46 PM" src="https://github.com/andersAsch0/CS120B_Embedded_Systems_Project/assets/84699083/a81334f7-7276-4352-800b-c9a9a908bb1a">
+
 Enemies before and after the switch. 
 
 
