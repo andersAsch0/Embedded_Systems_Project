@@ -4,7 +4,7 @@
 #include <exception>
 
 #include "ppm.h"
-
+//this was made by Solarian Programmer (sol_prog) for "Perlin Noise": https://github.com/sol-prog/Perlin_Noise
 //init with default values
 
 void ppm::init() {

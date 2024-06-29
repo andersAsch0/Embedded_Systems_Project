@@ -1,15 +1,19 @@
-#include "ppm.h"
+#include "ppm.h" //this was made by Solarian Programmer (sol_prog) for "Perlin Noise": https://github.com/sol-prog/Perlin_Noise
 #include <iostream>
 #include <fstream>
 // using namespace std;
 using std::vector; using std::string; using std::cout; using std::endl; using std::ofstream;
 
 /*
-You must set these const variables before running the program
+This is the program that I created and used for my CS120B 2024 final project. 
+(This is not the exact program I used, it has been significantly cleaned up but functionally is the same). 
+It takes a ppm file and converts it into a txt file in the format of a c array of ints according to a set color palette.
+
+You must set the const variables below before running the program.
 */
 
 /// @brief Do not include the file extension. This must be a ppm file in the same directory as this script
-const string INPUTFILENAME = "labProjectExplosion";
+const string INPUTFILENAME = "";
 /// @brief Do not include the file extension. This will be output as a .txt file in the same directory as this script
 const string OUTPUTFILENAME = "ppmReaderOutput";
 /// @brief each row corresponds to one number that will be output. Every sRGB color value listed will be mapped to its row index if encountered in the input ppm

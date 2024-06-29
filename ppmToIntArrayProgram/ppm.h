@@ -4,6 +4,7 @@
 
 #ifndef PPM_H
 #define PPM_H
+//this was made by Solarian Programmer (sol_prog) for "Perlin Noise": https://github.com/sol-prog/Perlin_Noise
 
 class ppm {
     void init();
