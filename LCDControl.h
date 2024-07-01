@@ -157,21 +157,27 @@ void drawIntroScreen(){
     LCDSelectGridArea(1, 4, 0, 7);
     LCDSendSpriteData(&titleSprite[0][0], 8192);
     LCDSelectGridArea(6, 7, 2, 5);
-    LCDSendSpriteData(&newGameOption[0][0], 2048);
+    LCDSendSpriteData(&newGameOption[0][0], 1728);
 }
 
-void drawPauseScreen(){
+void drawPauseScreen(unsigned char hasNewHighscore){
     clearLCD();
     LCDSelectGridArea(0, 2, 3, 4);
     LCDSendSpriteData(&pauseIcon[0][0], 1536);
     LCDSelectGridArea(4, 5, 0, 7);
-    LCDSendSpriteData(&pauseOptionsSprite[0][0], 4096);
+    LCDSendSpriteData(&pauseOptionsSprite[0][0], 3456);
     LCDSelectGridArea(6, 6, 0, 3);
     LCDSendSpriteData(&yourScoreText[0][0], 1024);
-    LCDSelectGridArea(7, 7, 0, 3);
-    LCDSendSpriteData(&highscoreText[0][0], 1024); 
     drawNumber(6, 4, currScore);
-    drawNumber(7, 4, highScore);
+    LCDSelectGridArea(7, 7, 0, 3);
+    if(hasNewHighscore){
+        LCDSendSpriteDataYellow(&highscoreText[0][0], 1024); 
+        drawNumberYellow(7, 4, highScore); 
+    }
+    else   {
+        LCDSendSpriteData(&highscoreText[0][0], 1024); 
+        drawNumber(7, 4, highScore); 
+    }
 
 }
 
@@ -180,7 +186,7 @@ void drawDeathScreen(unsigned char hasNewHighscore){
     LCDSelectGridArea(1, 3, 2, 5);
     LCDSendSpriteData(&deathScreenSprite[0][0], 2240);
     LCDSelectGridArea(4, 5, 2, 5);
-    LCDSendSpriteData(&newGameOption[0][0], 2048);
+    LCDSendSpriteData(&newGameOption[0][0], 1728);
     LCDSelectGridArea(6, 6, 0, 3);
     LCDSendSpriteData(&yourScoreText[0][0], 1024);
     drawNumber(6, 4, currScore);

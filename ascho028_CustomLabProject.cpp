@@ -1,7 +1,7 @@
 #include "timerISR.h"
 #include "helper.h" //setbit and getbit
 #include "periph.h" //ADC
-// #include "serialATmega.h"
+#include "serialATmega.h"
 #include "LCDControl.h"
 #include "gameOperations.h"
 #include "queue.h"
@@ -27,7 +27,7 @@ const unsigned char GameUpdatePeriod = 50;
 const unsigned short EnemyAdvancePeriod = 2000;
 const unsigned char BulletAdvancePeriod = 100;
 const unsigned char BuzzerPeriod = 100;
-const unsigned short IncDifficultyPeriod = 5000;
+const unsigned short IncDifficultyPeriod = 4000;
 
 task tasks[NUM_TASKS]; // declared task array with 5 tasks
 unsigned long ICR1Value = 16000000/ (50 * 8) - 1;     // 50 = 1/0.02 = 1/ 20 ms
@@ -36,6 +36,8 @@ uint8_t count = 0;
 enum InputEnum {RIGHTINPUT, LEFTINPUT, SHOOTINPUT, PAUSEINPUT, RESTARTINPUT, DIEINPUT, NOINPUT};
 queue inputs(5);
 int currGameState;
+unsigned char shootButtonDown = 0; //flags used for the reset highscore command
+unsigned char pauseButtonDown = 0;
 
 void buzzerInit(){
     TCCR1A |= (1 << WGM11) | (1 << COM1A1); //COM1A1 sets it to channel A
@@ -65,27 +67,44 @@ void TimerISR() {
 //tick functions for each task
 enum JoystickStates{JSLEFT, JSRIGHT, JSCENTER};
 int JoystickTick(int currState){
-    //mealy
+    static unsigned char holdCount = 0;
+    static const unsigned char holdLength = 15;
     switch (currState)
     {
     case JSCENTER:
-        if( ADC_read(4) < 400) {
+        if( ADC_read(4) > 600) {
             currState = JSRIGHT;
+            holdCount = 0;
             inputs.push(RIGHTINPUT);
         }
-        else if (ADC_read(4) > 600) {
+        else if ( ADC_read(4) < 400) {
             currState = JSLEFT;
+            holdCount = 0;
             inputs.push(LEFTINPUT);
         }
         else currState = JSCENTER;
         break;
     case JSLEFT:
-        if(( ADC_read(4) <= 600)) currState = JSCENTER;
+        if(( ADC_read(4) >= 400)) currState = JSCENTER;
         else currState = JSLEFT;
         break;
     case JSRIGHT: 
-        if(( ADC_read(4) >= 400)) currState = JSCENTER;
+        if(( ADC_read(4) <= 600)) currState = JSCENTER;
         else currState = JSRIGHT;
+        break;
+    default:
+        break;
+    }
+
+    switch (currState) //this is so the player can hold down the joystick and the tank will keep moving 
+    {
+    case JSLEFT:
+        holdCount++;
+        if(holdCount >= holdLength) {inputs.push(LEFTINPUT); holdCount = 0;}
+        break;
+    case JSRIGHT:
+        holdCount++;
+        if(holdCount >= holdLength) {inputs.push(RIGHTINPUT); holdCount = 0;}
         break;
     default:
         break;
@@ -100,11 +119,13 @@ int PauseButtonTick(int currState){
     case BUNPRESSED:
         if(ADC_read(3) > 100) {
             currState = BPRESSED;
+            pauseButtonDown = 1;
             inputs.push(PAUSEINPUT);  
         }
         break;
     case BPRESSED:
         if(ADC_read(3) <= 100){
+            pauseButtonDown = 0;
             currState = BUNPRESSED;
         }
     default:
@@ -136,11 +157,13 @@ int ShootButtonTick(int currState){
     case BUNPRESSED:
         if(ADC_read(5) > 100) {
             currState = BPRESSED;
+            shootButtonDown = 1;
             inputs.push(SHOOTINPUT);    
         }
         break;
     case BPRESSED:
         if(ADC_read(5) <= 100){
+            shootButtonDown = 0;
             currState = BUNPRESSED;
         }
     default:
@@ -152,9 +175,13 @@ int ShootButtonTick(int currState){
 
 enum GAMEUPDATESTATES{GStart, GIntro, GPaused, GDead, GGameplay, GDeathPause};
 int GameUpdateTick(int currState){
-    if(inputs.isEmpty()) return(currState); 
     static unsigned char input;
-    input = inputs.pop();   
+    static unsigned char deathPauseCount = 0;  
+    if(inputs.isEmpty()){ //if no player input
+        if(currState == GDeathPause) input = NOINPUT; //gdeathpause is the only state that needs to switch w no input
+        else return(currGameState); //in all other cases theres no need to check if theres been no input
+    }
+    else input = inputs.pop();  
 
     //transitions
     switch (currState)
@@ -163,13 +190,19 @@ int GameUpdateTick(int currState){
         if((input == PAUSEINPUT) || (input == RESTARTINPUT)) {
             triggerSound(BUTTONSOUND);
             currState = GPaused;
-            drawPauseScreen();
+            if(highScore > currScore){
+                drawPauseScreen(0);
+            }
+            else{
+                setHighScore(highScore);
+                drawPauseScreen(1);
+            }
             }
         else if(input == DIEINPUT){
             triggerSound(DEATHSOUND);
             drawExplosion(7, getPlayerLocation());
+            deathPauseCount = 0;
             currState = GDeathPause;
-            //draw explosion
         }
         break;
     case GPaused:
@@ -194,7 +227,8 @@ int GameUpdateTick(int currState){
         }
         break;
     case GIntro:
-        if((input == PAUSEINPUT) || (input == RESTARTINPUT)){
+        if((input == RESTARTINPUT)){
+            if(pauseButtonDown && shootButtonDown) setHighScore(0);
             triggerSound(BUTTONSOUND);
             resetGame();
             currState = GGameplay;
@@ -202,14 +236,13 @@ int GameUpdateTick(int currState){
         }
         break;
     case GDeathPause:
-        if(input == RESTARTINPUT){ 
-            triggerSound(BUTTONSOUND);
+        if((input == RESTARTINPUT) || (deathPauseCount >= 100)){ 
+            if((input == RESTARTINPUT)) triggerSound(BUTTONSOUND);
             currState = GDead;
             if(highScore > currScore){
                 drawDeathScreen(0);
             }
             else{
-                highScore = currScore;
                 setHighScore(highScore);
                 drawDeathScreen(1);
             }
@@ -231,6 +264,10 @@ int GameUpdateTick(int currState){
             if(input == RIGHTINPUT) movePlayer(1);
             else if (input == LEFTINPUT) movePlayer(-1);
             else if(input == SHOOTINPUT) {addBullet(); triggerSound(SHOOTSSOUND);}
+            break;
+        case GDeathPause:
+            deathPauseCount++;
+            break;
         default:
             break;
     }
@@ -262,8 +299,8 @@ int EnemyAdvanceTick(int currState){
     if(currGameState != GGameplay) return currState; //do nothing if paused, dead, etc
 
     if(advanceEnemies()) inputs.push(DIEINPUT);
-    for(unsigned char i = 0; i < 8; i++) if(flipCoin(currDifficulty)) spawnEnemy(i);
-
+    for(unsigned char i = 0; i < 9; i++) if(shouldSpawnEnemy(currDifficulty)) spawnEnemy(rand()%8);
+    serial_println(currDifficulty);
     return currState;
 }
 enum BULLETADVANCESTATES{BA};
@@ -291,9 +328,33 @@ int BuzzerTick(int currState){
 
 enum INCDIFFSTATES{Inc};
 int IncDifficultyTick(int currState){
-    if(currGameState == GGameplay) currDifficulty += 2;
+    if((currGameState == GGameplay) && (currDifficulty < 255)) currDifficulty ++;
     return currState;
 }
+
+//difficulty ideas: 
+/*
+the location of enemies will be completely random
+the amoount of enemies per advance should not b random bc it sucks
+perhaps an alternation: every other tick
+one is always set based on currdifficulty (&curr number on screen?), the next is random based on flipcoin & currdifficulty
+
+first level should have no enemies, and last 1-2 sec, then enemies come imediately
+should take ~ 1 min to ramp up to fairly difficult to b fun and challenging (avg of 1 enemy per tick)
+increase should slow, but still slowly getting harder
+should take 3-5 min to get to max difficulty
+max level should have avg of 6-8 enemies per tick, basically impossible for a human
+
+inc speed: 2 sec?
+
+0: no enemies
+1: avg 1 enemy per 5 ticks (0.2 per)
+5: avg 1 per 3 (0.33 per)
+10: avg 1 per 2 (0.5 per)
+20?: avg 1 enemy per tick (1 per)
+120: max (6+ per)
+
+*/
 
 int main(void) {
     //initialize all your inputs and ouputs
@@ -304,7 +365,7 @@ int main(void) {
 
     bulletArrayInit();
     ADC_init();
-    // serial_init(9600);
+    serial_init(9600);
     buzzerInit();
 
 
